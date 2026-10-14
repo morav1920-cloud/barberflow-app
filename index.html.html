@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Reserva tu Cita — BarberFlow Pro</title>
+<meta name="theme-color" content="#070707">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070707; --card-bg:rgba(18,18,18,0.92); --card-border:rgba(201,162,39,0.25);
+  --text:#F8F8F5; --text-muted:#9E9E9E; --gold:#C9A227; --gold-hover:#DFB530;
+  --gold-gradient:linear-gradient(135deg,#DFB530 0%,#A6821A 100%);
+  --danger:#D32F2F; --success:#2E7D32; --info:#0288D1; --border:rgba(255,255,255,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+#app{max-width:480px;margin:0 auto;width:100%;min-height:100vh;display:flex;flex-direction:column}
+.barra-top{background:rgba(12,12,12,0.95);backdrop-filter:blur(12px);padding:14px 16px;position:sticky;top:0;z-index:20;border-bottom:1px solid var(--card-border);display:flex;align-items:center;gap:12px}
+.logo{width:42px;height:42px;border-radius:10px;background:var(--gold-gradient);color:#000;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:22px}
+.t1{font-family:'Bebas Neue';font-size:1.4rem;color:var(--gold);letter-spacing:1px;line-height:1}
+.t2{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+main{flex:1;padding:16px;padding-bottom:40px}
+.card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:14px;padding:18px;margin-bottom:14px}
+.campo{margin-bottom:14px}
+.campo label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+.campo input,.campo select{width:100%;background:#121212;border:1.5px solid var(--card-border);border-radius:10px;padding:13px;font-size:15px;color:var(--text);outline:none;font-family:inherit}
+.campo input:focus{border-color:var(--gold)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:10px;padding:15px;font-weight:700;font-size:15px;cursor:pointer;width:100%;text-transform:uppercase;letter-spacing:1px;text-decoration:none;font-family:inherit}
+.btn-gold{background:var(--gold-gradient);color:#000;box-shadow:0 4px 15px rgba(201,162,39,0.3)}
+.btn-linea{background:transparent;border:1.5px solid var(--card-border);color:var(--text)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chip{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px;border-radius:12px;background:#121212;border:1.5px solid var(--card-border);cursor:pointer;color:var(--text);transition:all 0.15s;width:100%;text-align:left;font-family:inherit}
+.chip:active{transform:scale(0.98)}
+.chip.sel{border-color:var(--gold);background:rgba(201,162,39,0.12)}
+.chip .chip-fila{display:flex;justify-content:space-between;width:100%;align-items:center}
+.pasos{display:flex;gap:6px;margin-bottom:14px}
+.paso-dot{flex:1;height:4px;border-radius:4px;background:#222}
+.paso-dot.on{background:var(--gold)}
+.res-fila{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
+.res-fila:last-child{border-bottom:none}
+.codigo{font-family:'JetBrains Mono';font-size:1.2rem;color:var(--gold);text-align:center;background:#121212;padding:14px;border-radius:10px;border:1px dashed var(--gold);margin:10px 0;letter-spacing:2px;font-weight:700}
+.cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cal-head strong{font-family:'Bebas Neue';font-size:1.15rem;color:var(--gold);letter-spacing:1px}
+.cal-nav{background:#121212;border:1px solid var(--card-border);color:var(--gold);width:36px;height:36px;border-radius:8px;font-size:1.1rem;cursor:pointer}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-dow{text-align:center;font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;padding:4px 0}
+.cal-day{position:relative;background:#121212;border:1px solid var(--card-border);color:var(--text);border-radius:8px;min-height:42px;font-size:0.85rem;font-family:'JetBrains Mono';cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.cal-day.vacio{background:transparent;border:none;cursor:default}
+.cal-day.pasado{opacity:0.3;cursor:not-allowed}
+.cal-day.bloqueada{background:rgba(211,47,47,0.15);border-color:var(--danger);color:var(--danger);text-decoration:line-through;cursor:not-allowed}
+.cal-day.cerrado{opacity:0.35;cursor:not-allowed;background:repeating-linear-gradient(45deg,#121212,#121212 4px,#1c1c1c 4px,#1c1c1c 8px)}
+.cal-day.sel{border-color:var(--gold);background:rgba(201,162,39,0.18);color:var(--gold);font-weight:700}
+.cal-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);display:block}
+.slots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px}
+.slot-chip{background:#121212;border:1.5px solid var(--card-border);color:var(--text);border-radius:8px;padding:10px 4px;font-size:0.82rem;font-family:'JetBrains Mono';cursor:pointer}
+.slot-chip.sel{border-color:var(--gold);background:rgba(201,162,39,0.18);color:var(--gold);font-weight:700}
+.slot-chip.ocupada{opacity:0.28;cursor:not-allowed;text-decoration:line-through}
+.aviso{font-size:0.8rem;padding:10px 12px;border-radius:8px;margin-bottom:12px;line-height:1.5}
+.aviso.info{background:rgba(2,136,209,0.12);color:#4FC3F7;border:1px solid rgba(2,136,209,0.3)}
+.aviso.warn{background:rgba(201,162,39,0.12);color:var(--gold);border:1px solid rgba(201,162,39,0.3)}
+.aviso.politica{background:#121212;color:var(--text-muted);border:1px dashed var(--card-border);font-size:0.78rem}
+.aviso.politica ul{margin:6px 0 6px 18px;line-height:1.8}
+.divisor-punteado{border:none;border-top:2px dashed var(--card-border);margin:12px 0}
+.check-politica{display:flex;align-items:flex-start;gap:8px;font-size:0.82rem;color:var(--text);cursor:pointer;margin-top:8px}
+.check-politica input{width:auto;margin-top:2px}
+.cartbar{position:fixed;bottom:0;left:0;right:0;z-index:45;background:rgba(10,10,10,0.97);backdrop-filter:blur(8px);border-top:2px dashed var(--gold);padding:12px 16px;display:none}
+.cartbar.on{display:block}
+.cartrow{max-width:480px;margin:0 auto}
+.cartitem{font-size:12px;background:#121212;border-radius:8px;padding:6px 10px;margin:4px 0;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border)}
+.cartitem button{border:none;background:none;color:var(--danger);font-weight:700;cursor:pointer;font-size:14px}
+.cartitem-sel{font-size:13px;background:#0f0f0f;border-radius:8px;padding:8px 12px;margin:4px 0;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 12px}
+.tab{flex:0 0 auto;border:none;border-radius:999px;padding:10px 16px;background:#121212;font-weight:600;font-size:12px;white-space:nowrap;cursor:pointer;color:var(--text);border:1px solid var(--card-border);font-family:inherit}
+.tab.on{background:var(--gold-gradient);color:#000;border-color:transparent;font-weight:700}
+.estado-tag{display:inline-block;border-radius:999px;padding:4px 10px;font-size:0.72rem;font-weight:700;text-transform:uppercase}
+.estado-pendiente{background:rgba(201,162,39,0.15);color:var(--gold)}
+.estado-confirmada{background:rgba(46,125,50,0.15);color:#6DCF70}
+.estado-cancelada{background:rgba(211,47,47,0.15);color:#F87171}
+.estado-completada{background:rgba(2,136,209,0.15);color:#4FC3F7}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="barra-top">
+    <div class="logo">BF</div>
+    <div style="flex:1">
+      <div class="t1" id="app-nombre">BarberFlow Pro</div>
+      <div class="t2" id="app-sucursal">Sucursal Centro · Querétaro</div>
+    </div>
+    <button class="cal-nav" onclick="abrirMisCitas()" title="Mis citas" style="font-size:1rem">🔍</button>
+  </div>
+  <main id="vista"></main>
+</div>
+
+<script>
+'use strict';
+
+/* =====================================================
+   CONSTANTES Y CONFIGURACIÓN
+   ===================================================== */
+const STORAGE_KEY = 'barberflow_pro_db_v1';
+const CONFIG_DEFAULT = {
+  nombre: 'BarberFlow Pro',
+  sucursal: 'Sucursal Centro · Querétaro',
+  whatsapp: '524421234567',
+  horaApertura: '10:00',
+  horaCierre: '19:00',
+  metaDiaria: 3500,
+  diasAbiertos: [1, 2, 3, 4, 5, 6],
+  bufferMin: 10,
+  anticipoPct: 50,
+  banco: 'BBVA',
+  titular: 'BarberFlow Pro SA',
+  clabe: '012180012345678901',
+  maps: '',
+  politicasCancelacion: 24
+};
+
+const CATS = [
+  { id: 'cortes', icon: '💈', nombre: 'Cortes' },
+  { id: 'barba', icon: '🧔', nombre: 'Barba' },
+  { id: 'combos', icon: '⭐', nombre: 'Combos' },
+  { id: 'extras', icon: '✨', nombre: 'Extras' }
+];
+
+/* =====================================================
+   ESTADO GLOBAL
+   ===================================================== */
+let db = null;
+let S = null;
+let calMes = new Date();
+calMes.setDate(1);
+let catSel = 'cortes';
+let _bc = null;
+
+/* =====================================================
+   PERSISTENCIA
+   ===================================================== */
+function seedDB() {
+  return {
+    config: Object.assign({}, CONFIG_DEFAULT),
+    barberos: [
+      { id: 'b1', nombre: 'Alejandro "Alex" Fades', comisionServicio: 0.50, comisionProducto: 0.15 },
+      { id: 'b2', nombre: 'Rodrigo Barber', comisionServicio: 0.50, comisionProducto: 0.15 }
+    ],
+    servicios: [
+      { id: 's1', nombre: 'Corte Clásico / Fade', precio: 220, duracion: 35, cat: 'cortes' },
+      { id: 's2', nombre: 'Corte + Barba Perfilada', precio: 380, duracion: 50, cat: 'combos' },
+      { id: 's3', nombre: 'Combo VIP (Corte+Barba+Facial)', precio: 550, duracion: 75, cat: 'combos' },
+      { id: 's4', nombre: 'Afeitado Tradicional', precio: 200, duracion: 30, cat: 'barba' },
+      { id: 's5', nombre: 'Diseño de cejas', precio: 80, duracion: 15, cat: 'extras' }
+    ],
+    clientes: [],
+    inventario: [],
+    bloqueos: [],
+    citas: []
+  };
+}
+
+function cargarDB() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const d = JSON.parse(raw);
+      if (d && typeof d === 'object' && Array.isArray(d.servicios) && Array.isArray(d.barberos)) {
+        d.config = Object.assign({}, CONFIG_DEFAULT, d.config || {});
+        if (!Array.isArray(d.citas)) d.citas = [];
+        if (!Array.isArray(d.bloqueos)) d.bloqueos = [];
+        return d;
+      }
+    }
+  } catch (e) {
+    console.error('[Cliente] DB corrupta:', e);
+  }
+  return seedDB();
+}
+
+function guardarDB() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    broadcastUpdate();
+  } catch (e) {
+    console.error('[Cliente] Error al guardar:', e);
+  }
+}
+
+function cargarS() {
+  try {
+    const raw = localStorage.getItem('bf_cliente_reserva');
+    if (raw) {
+      const s = JSON.parse(raw);
+      if (!Array.isArray(s.cart)) s.cart = [];
+      return s;
+    }
+  } catch (e) {}
+  return { paso: 1, cart: [] };
+}
+
+function guardarS() {
+  try {
+    localStorage.setItem('bf_cliente_reserva', JSON.stringify(S));
+  } catch (e) {}
+}
+
+function limpiarS() {
+  try { localStorage.removeItem('bf_cliente_reserva'); } catch (e) {}
+  S = { paso: 1, cart: [] };
+}
+
+/* =====================================================
+   BROADCAST (seguro: nunca detiene el script)
+   ===================================================== */
+function initBroadcast() {
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      _bc = new BroadcastChannel('barberflow_sync');
+      _bc.onmessage = function (ev) {
+        if (ev.data && ev.data.type === 'db_updated') {
+          db = cargarDB();
+          aplicarConfig();
+          render();
+        }
+      };
+    }
+  } catch (e) {
+    _bc = null;
+  }
+}
+
+function broadcastUpdate() {
+  if (_bc) {
+    try { _bc.postMessage({ type: 'db_updated', at: Date.now() }); } catch (e) {}
+  }
+}
+
+/* =====================================================
+   HELPERS DE NEGOCIO
+   ===================================================== */
+function bufferMin() { return (db.config && db.config.bufferMin) || 10; }
+function anticipoPct() { return (db.config && db.config.anticipoPct) || 50; }
+function politicasH() { return (db.config && db.config.politicasCancelacion) || 24; }
+
+function horaToMin(hhmm) {
+  const p = hhmm.split(':');
+  return (parseInt(p[0], 10) || 0) * 60 + (parseInt(p[1], 10) || 0);
+}
+
+function totalCarrito() {
+  return S.cart.reduce(function (a, id) {
+    const s = db.servicios.find(function (x) { return x.id === id; });
+    return a + (s ? s.precio : 0);
+  }, 0);
+}
+
+function durCarrito() {
+  return S.cart.reduce(function (a, id) {
+    const s = db.servicios.find(function (x) { return x.id === id; });
+    return a + (s ? s.duracion : 0);
+  }, 0);
+}
+
+function esDiaAbierto(fechaObj) {
+  const dias = (db.config && db.config.diasAbiertos) || [1, 2, 3, 4, 5, 6];
+  return dias.includes(fechaObj.getDay());
+}
+
+function esBloqueada(fechaStr) {
+  return (db.bloqueos || []).some(function (b) {
+    return b.fecha === fechaStr && (!b.tipo || b.tipo === 'dia');
+  });
+}
+
+function hayConflicto(horaExistente, durExistente, horaNueva, durNueva) {
+  const iniNueva = horaToMin(horaNueva);
+  const finNueva = iniNueva + durNueva + bufferMin();
+  const iniExis = horaToMin(horaExistente);
+  const finExis = iniExis + durExistente + bufferMin();
+  return iniNueva < finExis && finNueva > iniExis;
+}
+
+function horarioBloqueado(fechaStr, horaStr, dur) {
+  const iniNueva = horaToMin(horaStr);
+  const finNueva = iniNueva + dur;
+  return (db.bloqueos || []).some(function (b) {
+    if (b.fecha !== fechaStr || b.tipo !== 'hora') return false;
+    const iniB = horaToMin(b.hora);
+    const finB = iniB + (b.duracion || 60);
+    return iniNueva < finB && finNueva > iniB;
+  });
+}
+
+function slotLibreAlguno(fechaStr, horaStr, dur) {
+  return db.barberos.some(function (b) {
+    return !db.citas.some(function (c) {
+      return c.barberoId === b.id && c.fecha === fechaStr &&
+        ['confirmada', 'en-curso', 'solicitud', 'pendiente_pago'].includes(c.estado) &&
+        hayConflicto(c.hora, c.duracion, horaStr, dur);
+    });
+  });
+}
+
+function puedeCancelarPor24h(cita) {
+  const fechaHora = new Date(cita.fecha + 'T' + cita.hora + ':00');
+  const horasFaltantes = (fechaHora - new Date()) / 3600000;
+  return horasFaltantes >= politicasH();
+}
+
+/* =====================================================
+   RENDER PRINCIPAL
+   ===================================================== */
+function render() {
+  const paso = S.paso || 1;
+  const vistas = {
+    1: pasoServicio,
+    2: pasoDatos,
+    3: pasoPago,
+    4: pasoConfirmacion,
+    5: pasoMisCitas
+  };
+  const vista = document.getElementById('vista');
+  if (!vista) return;
+  vista.innerHTML = (vistas[paso] || pasoServicio)();
+
+  if (paso === 2) { renderCalendario(); renderSlots(); }
+  if (paso === 5) { /* ya se renderizó en el HTML */ }
+
+  window.scrollTo(0, 0);
+}
+
+function barraPasos(actual) {
+  let html = '<div class="pasos">';
+  for (let p = 1; p <= 4; p++) {
+    html += '<div class="paso-dot' + (p <= actual ? ' on' : '') + '"></div>';
+  }
+  return html + '</div>';
+}
+
+/* =====================================================
+   PASO 1: SERVICIOS
+   ===================================================== */
+function pasoServicio() {
+  const srvFiltrados = db.servicios.filter(function (s) {
+    return (s.cat || 'cortes') === catSel;
+  });
+
+  let html = barraPasos(1);
+  html += '<div class="card" style="border-left:4px solid var(--gold)">' +
+    '<h3 style="font-family:\'Bebas Neue\';font-size:1.5rem;color:var(--gold)">Elige tus Servicios</h3>' +
+    '<p style="font-size:0.85rem;color:var(--text-muted);margin-top:4px">Agrega uno o varios servicios. Calculamos <b>un solo anticipo</b> del total.</p></div>';
+
+  html += '<div class="tabs">';
+  CATS.forEach(function (c) {
+    html += '<button class="tab ' + (c.id === catSel ? 'on' : '') + '" onclick="setCat(\'' + c.id + '\')">' + c.icon + ' ' + c.nombre + '</button>';
+  });
+  html += '</div>';
+
+  html += '<div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px">➕ Toca un servicio para agregarlo</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">';
+  if (srvFiltrados.length === 0) {
+    html += '<p style="text-align:center;color:var(--text-muted);font-size:0.85rem;padding:20px">Sin servicios en esta categoría.</p>';
+  } else {
+    srvFiltrados.forEach(function (s) {
+      const en = S.cart.includes(s.id);
+      html += '<button type="button" class="chip ' + (en ? 'sel' : '') + '" onclick="toggleSrv(\'' + s.id + '\')">' +
+        '<span class="chip-fila"><strong>' + s.nombre + '</strong> <span style="font-family:\'JetBrains Mono\';color:var(--gold)">$' + s.precio + '</span></span>' +
+        '<span style="font-size:0.75rem;color:var(--text-muted)">⏱ ' + s.duracion + ' min · ' + (en ? '✔ Agregado' : '＋ Agregar') + '</span>' +
+        '</button>';
+    });
+  }
+  html += '</div>';
+
+  if (S.cart.length > 0) {
+    html += '<hr class="divisor-punteado" style="margin:2px 0 14px">';
+    html += '<div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px">🧾 Tu pedido — lo que ya agregaste</div>';
+    html += '<div class="card"><h4 style="font-family:\'Bebas Neue\';color:var(--gold);font-size:1.1rem;margin-bottom:8px">🧾 Tu pedido</h4>' + cartHTML() + '</div>';
+  }
+
+  html += '<button class="btn btn-gold" onclick="continuarDesdeCarrito()">Continuar con ' + S.cart.length + ' servicio(s) →</button>';
+  return html;
+}
+
+function cartHTML() {
+  const items = S.cart.map(function (id) {
+    return db.servicios.find(function (s) { return s.id === id; });
+  }).filter(Boolean);
+  if (items.length === 0) return '<p style="font-size:0.85rem;color:var(--text-muted)">Aún no agregas servicios.</p>';
+  const total = items.reduce(function (a, s) { return a + s.precio; }, 0);
+  let html = '';
+  items.forEach(function (s) {
+    html += '<div class="cartitem-sel"><span>💈 ' + s.nombre + '</span><b style="color:var(--gold);font-family:\'JetBrains Mono\'">$' + s.precio + '</b></div>';
+  });
+  html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:14px">' +
+    '<span>Total:</span><b style="color:var(--gold);font-family:\'JetBrains Mono\'">$' + total + '</b></div>';
+  return html;
+}
+
+function pintarCart() {
+  const el = document.getElementById('cartbar');
+  if (!el) return;
+  const on = S.cart.length > 0 && (S.paso || 1) === 1;
+  el.classList.toggle('on', on);
+
+  const items = S.cart.map(function (id) {
+    return db.servicios.find(function (s) { return s.id === id; });
+  }).filter(Boolean);
+
+  const cartItems = document.getElementById('cartItems');
+  const cartTotal = document.getElementById('cartTotal');
+  if (cartItems) {
+    cartItems.innerHTML = items.map(function (s) {
+      return '<div class="cartitem"><span>💈 ' + s.nombre + ' · $' + s.precio + '</span><button onclick="toggleSrv(\'' + s.id + '\')">✕</button></div>';
+    }).join('');
+  }
+  if (cartTotal) {
+    cartTotal.textContent = 'Total: $' + items.reduce(function (a, s) { return a + s.precio; }, 0);
+  }
+}
+
+/* =====================================================
+   PASO 2: DATOS Y FECHA
+   ===================================================== */
+function pasoDatos() {
+  let html = barraPasos(2);
+  html += '<div class="card">' +
+    '<h3 style="font-family:\'Bebas Neue\';font-size:1.5rem;color:var(--gold);margin-bottom:12px">Tus Datos</h3>' +
+    '<div class="campo"><label>Nombre Completo</label><input id="f-nombre" value="' + (S.nombre || '') + '" placeholder="Ej. Carlos Mendoza"></div>' +
+    '<div class="campo"><label>WhatsApp a 10 dígitos</label><input id="f-tel" type="tel" value="' + (S.tel || '') + '" placeholder="4421234567"></div>' +
+    '</div>';
+
+  html += '<div class="card">' +
+    '<h3 style="font-family:\'Bebas Neue\';font-size:1.3rem;color:var(--gold);margin-bottom:8px">Elige el Día</h3>' +
+    '<div id="cal-wrap"></div></div>';
+
+  html += '<div class="card">' +
+    '<h3 style="font-family:\'Bebas Neue\';font-size:1.3rem;color:var(--gold);margin-bottom:8px">Elige la Hora</h3>' +
+    '<div id="slots-wrap"><p style="font-size:0.85rem;color:var(--text-muted)">Primero toca un día disponible.</p></div></div>';
+
+  html += '<div class="grid2">' +
+    '<button class="btn btn-linea" onclick="irPaso(1)">← Atrás</button>' +
+    '<button class="btn btn-gold" onclick="validarDatos()">Continuar y agendar cita →</button>' +
+    '</div>';
+  return html;
+}
+
+function renderCalendario() {
+  const wrap = document.getElementById('cal-wrap');
+  if (!wrap) return;
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const DOW = ['D','L','M','X','J','V','S'];
+  const y = calMes.getFullYear();
+  const m = calMes.getMonth();
+  const offset = new Date(y, m, 1).getDay();
+  const diasMes = new Date(y, m + 1, 0).getDate();
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+
+  let celdas = '';
+  DOW.forEach(function (d) { celdas += '<span class="cal-dow">' + d + '</span>'; });
+  for (let i = 0; i < offset; i++) celdas += '<span class="cal-day vacio"></span>';
+
+  for (let d = 1; d <= diasMes; d++) {
+    const fecha = new Date(y, m, d);
+    const fStr = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+    let cls = 'cal-day';
+    const esPasado = fecha < hoy;
+    if (esPasado) cls += ' pasado';
+    else if (!esDiaAbierto(fecha)) cls += ' cerrado';
+    else if (esBloqueada(fStr)) cls += ' bloqueada';
+    if (S.fecha === fStr) cls += ' sel';
+
+    const dot = db.citas.some(function (c) {
+      return c.fecha === fStr && ['confirmada','en-curso','completada','pendiente_pago'].includes(c.estado);
+    }) ? '<i class="cal-dot"></i>' : '';
+
+    const disabled = (esPasado || esBloqueada(fStr) || !esDiaAbierto(fecha)) ? 'disabled' : '';
+    celdas += '<button type="button" class="' + cls + '" ' + disabled + ' onclick="selDia(\'' + fStr + '\')">' + d + dot + '</button>';
+  }
+
+  wrap.innerHTML =
+    '<div class="cal-head">' +
+      '<button type="button" class="cal-nav" onclick="calNav(-1)">‹</button>' +
+      '<strong>' + MESES[m] + ' ' + y + '</strong>' +
+      '<button type="button" class="cal-nav" onclick="calNav(1)">›</button>' +
+    '</div>' +
+    '<div class="cal-grid">' + celdas + '</div>';
+}
+
+function renderSlots() {
+  const wrap = document.getElementById('slots-wrap');
+  if (!wrap) return;
+  if (!S.fecha) {
+    wrap.innerHTML = '<p style="font-size:0.85rem;color:var(--text-muted)">Primero toca un día disponible.</p>';
+    return;
+  }
+  const cfg = db.config || {};
+  const dur = durCarrito();
+  const minA = horaToMin(cfg.horaApertura || '10:00');
+  const minC = horaToMin(cfg.horaCierre || '19:00');
+  const ahora = new Date();
+  const esHoy = S.fecha === ahora.toISOString().slice(0, 10);
+  const minAhora = ahora.getHours() * 60 + ahora.getMinutes();
+
+  const matutino = [];
+  const vespertino = [];
+
+  for (let min = minA; min <= minC - dur; min += 15) {
+    const hh = String(Math.floor(min / 60)).padStart(2, '0');
+    const mm = String(min % 60).padStart(2, '0');
+    const horaStr = hh + ':' + mm;
+    let libre = !(esHoy && min <= minAhora) &&
+      slotLibreAlguno(S.fecha, horaStr, dur) &&
+      !horarioBloqueado(S.fecha, horaStr, dur);
+    if (libre && S.hora && horaStr !== S.hora && hayConflicto(S.hora, dur, horaStr, dur)) libre = false;
+    if (!libre && S.hora !== horaStr) continue;
+
+    const chip = '<button type="button" class="slot-chip' +
+      (S.hora === horaStr ? ' sel' : '') +
+      (libre ? '' : ' ocupada') + '" ' +
+      (libre ? '' : 'disabled') +
+      ' onclick="selHora(\'' + horaStr + '\')">' + horaStr + '</button>';
+
+    if (min < 14 * 60) matutino.push(chip);
+    else vespertino.push(chip);
+  }
+
+  const titulo = function (i, t) {
+    return '<div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:2px 0 8px;font-weight:700;">' + i + ' ' + t + '</div>';
+  };
+  const cu = function (arr) {
+    return arr.length
+      ? '<div class="slots-grid">' + arr.join('') + '</div>'
+      : '<p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;">Sin horarios en este turno.</p>';
+  };
+
+  wrap.innerHTML =
+    '<p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px;">Duración total: <b>' + dur + ' min</b> · Abrimos ' + (cfg.horaApertura || '10:00') + ' a ' + (cfg.horaCierre || '19:00') + ' hrs.</p>' +
+    titulo('🌅', 'Matutino') + cu(matutino) +
+    '<div style="height:16px"></div>' +
+    titulo('🌆', 'Vespertino') + cu(vespertino);
+}
+
+/* =====================================================
+   PASO 3: POLÍTICAS Y PAGO
+   ===================================================== */
+function pasoPago() {
+  const total = totalCarrito();
+  const anticipo = Math.round(total * anticipoPct() / 100);
+  const cfg = db.config || {};
+  const items = S.cart.map(function (id) {
+    return db.servicios.find(function (s) { return s.id === id; });
+  }).filter(Boolean);
+
+  let html = barraPasos(3);
+  html += '<div class="card" style="border-left:4px solid var(--gold)">' +
+    '<h3 style="font-family:\'Bebas Neue\';font-size:1.4rem;color:var(--gold)">Confirma y Aparta tu Cita</h3></div>';
+
+  const nombresSrv = items.map(function (s) { return s.nombre; }).join(' + ');
+  html += '<div class="card" style="padding:12px 16px">' +
+    '<div style="font-size:0.85rem;line-height:1.7"><b>' + nombresSrv + '</b><br>' +
+    '<span style="color:var(--text-muted);font-size:0.8rem">📅 ' + S.fecha + ' · 🕐 ' + S.hora + ' hrs · ⏱ ' + durCarrito() + ' min · Total: <b style="color:var(--gold);font-family:\'JetBrains Mono\'">$' + total + '</b></span>' +
+    '</div></div>';
+
+  html += '<div class="aviso politica">' +
+    '<b style="color:var(--gold)">📋 Políticas del servicio</b>' +
+    '<ul>' +
+      '<li>El comprobante de tu anticipo debe enviarse por WhatsApp para confirmar tu cita.</li>' +
+      '<li>El anticipo asegura tu espacio en la barbería.</li>' +
+      '<li>Si necesitas <b>cancelar o reagendar</b>, hazlo con al menos <b>' + politicasH() + ' horas</b> de anticipación usando tu código de reserva.</li>' +
+      '<li>No hay reembolso del anticipo por falta de asistencia (no-show).</li>' +
+      '<li>Por respeto a los demás clientes, te pedimos llegar puntual a tu cita.</li>' +
+    '</ul>' +
+    '<label class="check-politica">' +
+      '<input type="checkbox" id="acepto" ' + (S.acepto ? 'checked' : '') + '>' +
+      '<b>He leído y acepto las políticas del servicio</b>' +
+    '</label>' +
+    '</div>';
+
+  html += '<div class="card">' +
+    '<h4 style="font-family:\'Bebas Neue\';color:var(--gold);font-size:1.1rem;margin-bottom:8px">💳 Anticipo (' + anticipoPct() + '%)</h4>' +
+    '<p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">Monto a transferir: <b style="color:var(--gold);font-family:\'JetBrains Mono\';font-size:1.1rem">$' + anticipo + ' MXN</b></p>' +
+    '<p style="font-size:0.85rem;line-height:1.9">' +
+      '🏦 <b>Banco:</b> ' + (cfg.banco || 'Por configurar') + '<br>' +
+      '👤 <b>Titular:</b> ' + (cfg.titular || '—') + '<br>' +
+      '🔢 <b>CLABE:</b> <code style="font-family:\'JetBrains Mono\';background:#121212;padding:3px 8px;border-radius:6px;font-size:0.85rem">' + (cfg.clabe || 'Por configurar') + '</code><br>' +
+      '📝 <b>Concepto:</b> ' + (S.nombre || '') + ' — ' + S.fecha +
+    '</p></div>';
+
+  html += '<div class="grid2">' +
+    '<button class="btn btn-linea" onclick="irPaso(2)">← Atrás</button>' +
+    '<button class="btn btn-gold" onclick="confirmarReserva()">✔ Aceptar cita y continuar →</button>' +
+    '</div>';
+  return html;
+}
+
+/* =====================================================
+   PASO 4: CONFIRMACIÓN
+   ===================================================== */
+function pasoConfirmacion() {
+  if (!S.guardado) {
+    const total = totalCarrito();
+    const dur = durCarrito();
+    S.codigo = 'BF-' + Math.random().toString(36).slice(-6).toUpperCase();
+    const serviciosIds = S.cart.slice();
+
+    db.citas.push({
+      id: 'sol-' + Date.now(),
+      codigo: S.codigo,
+      nombreCliente: S.nombre,
+      telCliente: S.tel,
+      clienteId: null,
+      barberoId: null,
+      servicioIds: serviciosIds,
+      servicioId: serviciosIds[0],
+      fecha: S.fecha,
+      hora: S.hora,
+      duracion: dur,
+      precioTotal: total,
+      anticipoPct: anticipoPct(),
+      anticipoMonto: Math.round(total * anticipoPct() / 100),
+      estado: 'pendiente_pago',
+      pago: 'pendiente',
+      comprobante: null,
+      timestamp: new Date().toISOString()
+    });
+    guardarDB();
+    S.guardado = true;
+    guardarS();
+  }
+
+  const cfg = db.config || {};
+  const total = totalCarrito();
+  const anticipo = Math.round(total * anticipoPct() / 100);
+  const serviciosNombres = S.cart.map(function (id) {
+    const s = db.servicios.find(function (x) { return x.id === id; });
+    return s ? s.nombre : '';
+  }).join(' + ');
+
+  const msg = encodeURIComponent(
+    '💈 *RESERVA ' + S.codigo + ' — ' + ((cfg.nombre || 'BARBERFLOW PRO').toUpperCase()) + '*\n\n' +
+    '*Servicios:* ' + serviciosNombres + '\n' +
+    '*Fecha:* ' + S.fecha + ' a las ' + S.hora + ' hrs\n' +
+    '*Duración:* ' + durCarrito() + ' min\n' +
+    '*Total:* $' + total + ' MXN\n' +
+    '*Anticipo (' + anticipoPct() + '%):* $' + anticipo + ' MXN\n\n' +
+    '👤 ' + S.nombre + '\n' +
+    '📱 ' + S.tel + '\n\n' +
+    '📎 *Adjunto mi comprobante de transferencia.* Favor de confirmar mi cita.\nGracias 💈'
+  );
+
+  const waNumber = cfg.whatsapp || '524421234567';
+
+  let html = barraPasos(4);
+  html += '<div class="card" style="text-align:center">' +
+    '<div style="font-size:3rem">✨</div>' +
+    '<h3 style="font-family:\'Bebas Neue\';font-size:1.8rem;color:var(--gold)">¡Cita Apartada!</h3>' +
+    '<p style="font-size:0.85rem;color:var(--text-muted);margin-top:4px">Guarda tu código. Lo necesitarás para consultar, cancelar o reagendar tu cita.</p>' +
+    '</div>';
+
+  html += '<div class="codigo">' + S.codigo + '</div>';
+
+  html += '<div class="card">' +
+    '<h4 style="font-family:\'Bebas Neue\';color:var(--gold);font-size:1.15rem;margin-bottom:10px">💳 Cómo pagar tu anticipo</h4>' +
+    '<p style="font-size:0.85rem;line-height:1.9">' +
+      '🏦 <b>Banco:</b> ' + (cfg.banco || '—') + '<br>' +
+      '👤 <b>Titular:</b> ' + (cfg.titular || '—') + '<br>' +
+      '🔢 <b>CLABE:</b><br>' +
+      '<code style="font-family:\'JetBrains Mono\';font-size:0.95rem;background:#121212;padding:8px 10px;border-radius:8px;display:inline-block;margin-top:4px;letter-spacing:1px">' + (cfg.clabe || '—') + '</code><br>' +
+      '📝 <b>Concepto:</b> ' + S.nombre + ' — ' + S.codigo + '<br>' +
+      '💰 <b>Monto exacto:</b> <span style="color:var(--gold);font-family:\'JetBrains Mono\';font-size:1.1rem;font-weight:700">$' + anticipo + ' MXN</span>' +
+    '</p></div>';
+
+  html += '<div class="aviso warn">⚠️ <b>Importante:</b> Tu cita queda como <b>pendiente de verificación</b> hasta que la barbería confirme tu comprobante.</div>';
+
+  html += '<div class="card">' +
+    '<h4 style="font-family:\'Bebas Neue\';color:var(--gold);font-size:1.15rem;margin-bottom:8px">📋 Resumen</h4>' +
+    '<div class="res-fila"><span style="color:var(--text-muted)">Cliente</span><b>' + S.nombre + '</b></div>' +
+    '<div class="res-fila"><span style="color:var(--text-muted)">Servicios</span><b style="text-align:right;max-width:62%;font-size:0.85rem">' + serviciosNombres + '</b></div>' +
+    '<div class="res-fila"><span style="color:var(--text-muted)">Horario</span><b>' + S.fecha + ' · ' + S.hora + ' hrs</b></div>' +
+    '<div class="res-fila"><span style="color:var(--text-muted)">Total</span><b style="font-family:\'JetBrains Mono\'">$' + total + '</b></div>' +
+    '<div class="res-fila"><span style="color:var(--text-muted)">Anticipo</span><b style="font-family:\'JetBrains Mono\';color:var(--gold)">$' + anticipo + '</b></div>' +
+    '</div>';
+
+  html += '<div class="card" style="background:linear-gradient(135deg,rgba(201,162,39,0.08),rgba(201,162,39,0.02));border-color:var(--gold)">' +
+    '<h4 style="font-family:\'Bebas Neue\';color:var(--gold);font-size:1.15rem;margin-bottom:8px">📲 Paso final: enviar comprobante</h4>' +
+    '<p style="font-size:0.83rem;color:var(--text-muted);line-height:1.7;margin-bottom:12px">' +
+      'Transfiere <b style="color:var(--gold)">$' + anticipo + ' MXN</b> a la CLABE, toma captura y envíalo por WhatsApp.' +
+    '</p>' +
+    '<a class="btn btn-gold" href="https://wa.me/' + waNumber + '?text=' + msg + '" target="_blank">💬 Enviar comprobante por WhatsApp</a>' +
+    '<button class="btn btn-linea" style="margin-top:10px" onclick="marcarComprobanteEnviado()">' +
+      (S.comprobanteEnviado ? '✅ Ya lo envié' : '📎 Marcar como enviado') +
+    '</button></div>';
+
+  if (cfg.maps) {
+    html += '<a class="btn btn-linea" href="' + cfg.maps + '" target="_blank" style="text-decoration:none">📍 Cómo llegar</a>';
+  }
+
+  html += '<div style="margin-top:16px">' +
+    '<button class="btn btn-linea" onclick="irPaso(5)">🔍 Ver estado de mis citas</button>' +
+    '<button class="btn btn-linea" style="margin-top:10px" onclick="nuevaReserva()">🔄 Reservar otra cita</button>' +
+    '</div>';
+  return html;
+}
+
+/* =====================================================
+   PASO 5: MIS CITAS
+   ===================================================== */
+function pasoMisCitas() {
+  const cod = S.buscarCodigo || '';
+  let citas = [];
+  if (cod) {
+    citas = db.citas.filter(function (c) { return c.codigo === cod.toUpperCase(); });
+  } else if (S.tel) {
+    citas = db.citas.filter(function (c) { return String(c.telCliente || '').replace(/\D/g, '') === S.tel || c.codigo === S.codigo; });
+  } else if (S.codigo) {
+    citas = db.citas.filter(function (c) { return c.codigo === S.codigo; });
+  }
+
+  let html = '<div class="card" style="border-left:4px solid var(--gold)">' +
+    '<h3 style="font-family:\'Bebas Neue\';font-size:1.5rem;color:var(--gold)">Mis Citas</h3>' +
+    '<p style="font-size:0.82rem;color:var(--text-muted);margin-top:4px">Busca por código o usa tu WhatsApp registrado.</p>' +
+    '</div>';
+
+  html += '<div class="card">' +
+    '<div class="campo"><label>Código de reserva</label>' +
+    '<input id="mi-codigo" value="' + (S.buscarCodigo || '') + '" placeholder="Ej. BF-A1B2C3" style="text-transform:uppercase"></div>' +
+    '<button class="btn btn-gold" onclick="buscarMisCitas()">🔍 Buscar</button>';
+
+  if (S.tel) {
+    html += '<button class="btn btn-linea" style="margin-top:8px" onclick="verTodasMisCitas()">Ver todas con mi WhatsApp</button>';
+  }
+  html += '</div>';
+
+  if (citas.length === 0) {
+    html += '<div class="aviso info">No encontramos citas. Ingresa tu código de reserva para buscar.</div>';
+  } else {
+    citas.forEach(function (c) {
+      const srvNames = (c.servicioIds || [c.servicioId]).map(function (id) {
+        const s = db.servicios.find(function (x) { return x.id === id; });
+        return s ? s.nombre : '';
+      }).filter(Boolean).join(' + ');
+
+      const puedeCancelar = ['confirmada','pendiente_pago','solicitud'].includes(c.estado) && puedeCancelarPor24h(c);
+
+      const estadoTxt = {
+        'pendiente_pago': '⏳ Pendiente de pago',
+        'solicitud': '📩 Por confirmar',
+        'confirmada': '✅ Confirmada',
+        'en-curso': '💈 En curso',
+        'completada': '✔ Completada',
+        'cancelada': '✕ Cancelada',
+        'no-show': '⚠️ No-show'
+      }[c.estado] || c.estado;
+
+      const estadoCls = {
+        'pendiente_pago': 'estado-pendiente',
+        'solicitud': 'estado-pendiente',
+        'confirmada': 'estado-confirmada',
+        'en-curso': 'estado-confirmada',
+        'completada': 'estado-completada',
+        'cancelada': 'estado-cancelada',
+        'no-show': 'estado-cancelada'
+      }[c.estado] || 'estado-pendiente';
+
+      html += '<div class="card">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">' +
+          '<div style="flex:1">' +
+            '<div style="font-family:\'JetBrains Mono\';color:var(--gold);font-size:0.9rem;font-weight:700">' + (c.codigo || '') + '</div>' +
+            '<div style="font-size:0.9rem;margin-top:6px">' + srvNames + '</div>' +
+            '<div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">📅 ' + c.fecha + ' · 🕐 ' + c.hora + ' hrs</div>' +
+            '<div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px">Total: $' + (c.precioTotal || 0) + ' · Anticipo: $' + (c.anticipoMonto || 0) + '</div>' +
+          '</div>' +
+          '<span class="estado-tag ' + estadoCls + '">' + estadoTxt + '</span>' +
+        '</div>';
+
+      if (puedeCancelar) {
+        html += '<div class="grid2" style="margin-top:12px">' +
+          '<button class="btn btn-linea" style="font-size:0.8rem;padding:10px" onclick="cancelarCita(\'' + c.codigo + '\')">✕ Cancelar</button>' +
+          '<button class="btn btn-gold" style="font-size:0.8rem;padding:10px" onclick="reagendarCita(\'' + c.codigo + '\')">🔄 Reagendar</button>' +
+          '</div>';
+      } else {
+        html += '<p style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;font-style:italic">No se puede modificar (menos de ' + politicasH() + 'h o ya finalizada).</p>';
+      }
+      html += '</div>';
+    });
+  }
+
+  html += '<button class="btn btn-linea" onclick="irPaso(1)">← Volver al inicio</button>';
+  return html;
+}
+
+/* =====================================================
+   ACCIONES (expuestas en window)
+   ===================================================== */
+function setCat(id) {
+  catSel = id;
+  render();
+}
+
+function toggleSrv(id) {
+  const i = S.cart.indexOf(id);
+  if (i >= 0) S.cart.splice(i, 1);
+  else S.cart.push(id);
+  guardarS();
+  render();
+}
+
+function continuarDesdeCarrito() {
+  if (S.cart.length === 0) { alert('Agrega al menos un servicio 💈'); return; }
+  S.paso = 2;
+  S.fecha = null;
+  S.hora = null;
+  guardarS();
+  render();
+}
+
+function irPaso(n) {
+  S.paso = n;
+  guardarS();
+  render();
+}
+
+function calNav(delta) {
+  calMes.setMonth(calMes.getMonth() + delta);
+  renderCalendario();
+}
+
+function selDia(fStr) {
+  S.fecha = fStr;
+  S.hora = null;
+  guardarS();
+  renderCalendario();
+  renderSlots();
+}
+
+function selHora(h) {
+  S.hora = h;
+  guardarS();
+  renderSlots();
+}
+
+function validarDatos() {
+  const nom = document.getElementById('f-nombre');
+  const tel = document.getElementById('f-tel');
+  if (!nom || !tel) return;
+  S.nombre = nom.value.trim();
+  S.tel = tel.value.replace(/\D/g, '');
+  if (!S.nombre || S.tel.length < 10) { alert('Completa tu nombre y un WhatsApp válido (10 dígitos).'); return; }
+  if (!S.fecha) { alert('Toca un día disponible en el calendario.'); return; }
+  if (!S.hora) { alert('Toca un horario libre.'); return; }
+  S.paso = 3;
+  guardarS();
+  render();
+}
+
+function confirmarReserva() {
+  const chk = document.getElementById('acepto');
+  const acepto = chk ? chk.checked : false;
+  S.acepto = acepto;
+  guardarS();
+  if (!acepto) { alert('⚠️ Debes aceptar las políticas del servicio para apartar tu cita.'); return; }
+
+  const dur = durCarrito();
+  if (!slotLibreAlguno(S.fecha, S.hora, dur) || horarioBloqueado(S.fecha, S.hora, dur)) {
+    alert('⏳ Ese horario acaba de ocuparse. Elige otro, por favor.');
+    S.hora = null;
+    S.paso = 2;
+    guardarS();
+    render();
+    return;
+  }
+  S.paso = 4;
+  guardarS();
+  render();
+}
+
+function marcarComprobanteEnviado() {
+  const c = db.citas.find(function (x) { return x.codigo === S.codigo; });
+  if (!c) return;
+  c.comprobante = 'enviado';
+  c.comprobanteTimestamp = new Date().toISOString();
+  guardarDB();
+  S.comprobanteEnviado = true;
+  guardarS();
+  alert('✅ Marcado como enviado. La barbería confirmará tu cita en breve.');
+  render();
+}
+
+function abrirMisCitas() {
+  S.paso = 5;
+  guardarS();
+  render();
+}
+
+function buscarMisCitas() {
+  const el = document.getElementById('mi-codigo');
+  S.buscarCodigo = el ? el.value.trim().toUpperCase() : '';
+  guardarS();
+  render();
+}
+
+function verTodasMisCitas() {
+  S.buscarCodigo = '';
+  guardarS();
+  render();
+}
+
+function cancelarCita(codigo) {
+  const c = db.citas.find(function (x) { return x.codigo === codigo; });
+  if (!c) return;
+  if (!puedeCancelarPor24h(c)) {
+    alert('⚠️ No puedes cancelar con menos de ' + politicasH() + ' horas de anticipación.');
+    return;
+  }
+  if (!confirm('¿Cancelar esta cita? El anticipo no es reembolsable.')) return;
+  c.estado = 'cancelada';
+  c.canceladoTimestamp = new Date().toISOString();
+  guardarDB();
+  alert('✅ Cita cancelada. Se liberó tu horario.');
+  render();
+}
+
+function reagendarCita(codigo) {
+  const c = db.citas.find(function (x) { return x.codigo === codigo; });
+  if (!c) return;
+  if (!puedeCancelarPor24h(c)) {
+    alert('⚠️ No puedes reagendar con menos de ' + politicasH() + ' horas de anticipación.');
+    return;
+  }
+  S.cart = (c.servicioIds || [c.servicioId]).slice();
+  S.nombre = c.nombreCliente;
+  S.tel = c.telCliente;
+  S.fecha = null;
+  S.hora = null;
+  S.guardado = false;
+  S.codigo = null;
+  S.comprobanteEnviado = false;
+  S.reagendando = c.id;
+  c.estado = 'cancelada';
+  c.nota = 'Reagendada por el cliente';
+  guardarDB();
+  S.paso = 2;
+  guardarS();
+  render();
+  alert('🔄 Elige una nueva fecha y hora para tu cita.');
+}
+
+function nuevaReserva() {
+  limpiarS();
+  render();
+}
+
+function aplicarConfig() {
+  const cfg = (db && db.config) || {};
+  const elN = document.getElementById('app-nombre');
+  const elS = document.getElementById('app-sucursal');
+  if (elN) elN.textContent = cfg.nombre || 'BarberFlow Pro';
+  if (elS) elS.textContent = cfg.sucursal || 'Sucursal Centro · Querétaro';
+}
+
+/* =====================================================
+   EXPONER FUNCIONES EN WINDOW (para onclick)
+   ===================================================== */
+window.setCat = setCat;
+window.toggleSrv = toggleSrv;
+window.continuarDesdeCarrito = continuarDesdeCarrito;
+window.irPaso = irPaso;
+window.calNav = calNav;
+window.selDia = selDia;
+window.selHora = selHora;
+window.validarDatos = validarDatos;
+window.confirmarReserva = confirmarReserva;
+window.marcarComprobanteEnviado = marcarComprobanteEnviado;
+window.abrirMisCitas = abrirMisCitas;
+window.buscarMisCitas = buscarMisCitas;
+window.verTodasMisCitas = verTodasMisCitas;
+window.cancelarCita = cancelarCita;
+window.reagendarCita = reagendarCita;
+window.nuevaReserva = nuevaReserva;
+
+/* =====================================================
+   BOOT
+   ===================================================== */
+function boot() {
+  db = cargarDB();
+  S = cargarS();
+  initBroadcast();
+  aplicarConfig();
+  render();
+}
+
+window.addEventListener('storage', function (e) {
+  if (e.key === STORAGE_KEY) {
+    db = cargarDB();
+    aplicarConfig();
+    render();
+  }
+});
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
+</script>
+</body>
+</html>
